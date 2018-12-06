@@ -1,15 +1,20 @@
-#######################################################################
-#				COIN FLIP
+"""
+`coinflip'
+===========
+Generate a random graph by coin flipping.  The input is a 
+-----
+- `p` : square matrix with entries between 0 and 1. 
+Functions
+---------
+- `coinflip(p::Float64)` 
+Output
+------
+- A 0 or 1 adjacency matrix for the random graph.
 
-#=
-Generate a random graph by coin flipping.  The input is a square matrix P with entries
-between 0 and 1.  The result is a 0 or 1 adjacency matrix for the random graph.
 
-Example:
-	coinflip(0.25*ones(8,8))  #generate a random Erdos-Renyi graph
-=#
+"""
 
-function coinflip(p)
+function coinflip(p::Float64)
 	n = size(p,1)
 	type = eltype(p)
 	n == size(p,2) ? nothing : throw(AssertionError("Matrix not square"))   # make sure we have a square input
@@ -22,21 +27,26 @@ function coinflip(p)
 	return A
 end
 
-println(coinflip(.25*ones(8,8)))  # generate a random Erdos-Renyi graph
+#println(coinflip(.25*ones(8,8)))  # generate a random Erdos-Renyi graph
 
-#######################################################################
-#				BALL DROPPER
-#=
-Generate a random Erdos-Renyi graph by ball-dropping.  The input is:
-	n: the number of nodes
-	p: the probablity of an edge
-The result is a list of directed edges.
+"""
+`ball_drop_er`
+===============
+Generate a random Erdos-Renyi graph by ball-dropping.
+Input
+-----
+- `n` : the number of nodes
+- `p` : the probablity of an edge
+Functions
+---------
+- `ball_drop_er`(n::Int64,p::Float64)
+Output
+-------
+- List of directed edges.
 
-Example:
-	ball_drop_er(8,0.25)  # 8 node Erdos-Renyi with probablity 0.25
-=#
+"""
 
-function ball_drop_er(n,p)
+function ball_drop_er(n::Int64,p::Float64)
 	m = rand(Binomial(n*n,p))              # the number of edges
 	edges = Set{typeof((n,n))}()           # create a set of type n
 	while length(edges) < m
@@ -45,22 +55,26 @@ function ball_drop_er(n,p)
 	return edges
 end
 
-println(ball_drop_er(8,.25))  # 8 node Erdos-Renyi with probablity 0.25
+#println(ball_drop_er(8,.25))  # 8 node Erdos-Renyi with probablity 0.25
 
-#######################################################################
-#				GRASS HOPPER
+"""
+`grass_hop_er`
+===============
+Generate a random Erdos-Renyi graph by grass-hopping. 
+Input
+-----
+- `n` : the number of nodes
+- `p` : the probablity of an edge
+Functions
+---------
+- `grass_hop_er(n::Int64,p::Float64)`
+Output
+------
+- The result is a list of directed edges.
 
-#= 
-Generate a random Erdos-Renyi graph by grass-hopping. The input is:
-	 n: the number of nodes
-	 p: the probablity of an edge
-The result is a list of directed edges.
+"""
 
-Example:
-	 grass_hop_er(8,0.25) # 8 node Erdos-Renyi with probablity 0.25
-=#     
-
-function grass_hop_er(n,p)
+function grass_hop_er(n::Int64,p::Float64)
 	edgeindex = -1                 # we label edges from 0 to n^2-1
 	gap = rand(Geometric(p))       # first distance to edge
 	edges = Set{typeof((n,n))}()   # make a set of type n
@@ -74,18 +88,29 @@ function grass_hop_er(n,p)
 	return edges
 end
 
-println(grass_hop_er(8,0.25))
+#println(grass_hop_er(8,0.25))
 
-#######################################################################
-#				SBM2
-
-#= 
+"""
+`sbm2`
+======
 Generate edges for a stochastic block model with two blocks.
-n1 and n2 are the sies of the two blocks and p is the within group
-probablitiy and q is the between group probablitly
-Example: sbm2(20,15,0.5,0.1) # 20 nodes in group 1, 15 nodes in group 2 ...
-=#
-function sbm2(n1,n2,p,q)
+
+Input
+-----
+- `n1` : Size of block
+- `n2` : Size of block
+- `p`  : within group probablity
+- `q`  : between group probablity
+Functions
+---------
+- `sbm2(n1::Int64,n2::Int64,p::Float64,q::Float64)`
+
+Output
+------
+- Edges for a stochastic block model with two blocks
+
+"""
+function sbm2(n1::Int64,n2::Int64,p::Float64,q::Float64)
 	edges = grass_hop_er(n1,p)               #genertate the n1-by-n1 block
 	for (i,j) in grass_hop_er(n2,p)          #n2-by-n2 block
 		push!(edges,(i+n1,j+n1))
@@ -103,65 +128,28 @@ function sbm2(n1,n2,p,q)
 	return edges
 end  
 
-println(sbm2(20,15,.5,.1)) 
-
-#######################################################################
-#				REGION -- UNFINISHED
-
-#=
-Generate the set of Erdos-Reyni regions in a Kronecker graph
-where v = vec(K), and k = number of levels. Each region gives indices
-into v that produce a distinct Erdos-Reyni probability. 
-Example: regions([0.99,0.5,0.5,0.2],3) 
-=#
-
-function next_region(cur,m)
-	k = length(cur)
-	println(k, m, cur)
-	cur[k] += 1
-	if cur[k] == m
-		println("here", cur[k], m)
-		if length(cur) > 1
-			cur[1:k] = next_region(cur[1],m)
-			println(cur)
-			cur[k] = cur[k-1]
-			println(cur)
-		else
-			println("else")
-			cur[k] = -1
-		end
-	end
-	return cur
-end
-	
-
-function regions(v,k)
-	m = length(v)
-	rval = []
-	cur = zeros(Int,k)
-	while cur[1] != -1
-		push!(rval,cur)
-		next_region(cur,m)
-	end
-	return rval
-end
-
-println(regions([0.99,0.5,0.5,0.2],3))
+#println(sbm2(20,15,.5,.1)) 
 
 
-#######################################################################
-#				UNRANK
+"""
+- `unrank`
+===========
+Input
+-----
+- `C`: a multiset represented by a list
+- `n`: the lexicographic rank to find
+Functions
+---------
+- `ndseq_to_counter(seq)`
+- `counter_to_ndseq(mset, keys)`
+- `num_multiset_permutations(mset)`
+- `unrank_mset_counter(mset,keys,n)`
+- `unrank(seq,n)`
 
-#=unrank takes as input:
-	C: a multiset represented by a list
-	n: the lexicographic rank to find
-and returns the nth permutation of C in lexicographic order
-
-Examples:
-	unrank([0,1,1,3], 0) returns [0,1,1,3]
-	unrank([0,1,1,3], 1) returns [0,1,3,1]
-	unrank([0,1,1,3], 2) returns [0,3,1,1]
-=#
+Output
+------
+The nth permutation of C in lexicographic order
+"""
 
 function ndseq_to_counter(seq)
 	mset = Dict{Int64, Int64}()
@@ -222,45 +210,34 @@ println(unrank([0,1,1,3], 0))
 println(unrank([0,1,1,3], 1))
 println(unrank([0,1,1,3], 2))
 
-#######################################################################
-#				GRASSHOPPER REGION -- NEED TO FINISH REGION
 
-function grass_hop_region(r,v)
-	p = multtable(r,v)
-	return p
-end
-
-function multtable(r,v)
-	final = 1.0
-	for val in r
-		final *= v[val]
-	end
-	return final
-end
-
-v = [.99, .5, .5, 2]
-println(grass_hop_region(regions(v,3)[2],v))
-
-#######################################################################
-#				MAP MULT TO KRON
-
-#= 
+"""
+`map_mult_to_kron`
+===================
 Map a multi-index from the mult. table 
 table to a row and column in the Kronecker 
-matrix. The input is:
-	mind: the multi-index for the mult table
-	n: the size of the initiator matrix K
-Example:
-	map_mult_to_kron([1,3],2)   # = (3,1)
-	map_mult_to_kron([4,0,7],3) # = (10,11)
-=#
+matrix.
+Input
+-----	
+- `mind` : the multi-index for the mult table
+- `n`    : the size of the initiator matrix K
+Functions
+---------
+- `map_mult_to_kron(mind,n::Int64)`
+- `multiindex_to_linear(mind, n2::Int64)`
+- `morton_decode(I::Int64,n::Int64)`
+Output
+------
 
-function map_mult_to_kron(mind,n)
+
+"""
+
+function map_mult_to_kron(mind,n::Int64)
 	I = multiindex_to_linear(mind, n*n)
 	return morton_decode(I,n)
 end
 
-function multiindex_to_linear(mind, n2)
+function multiindex_to_linear(mind, n2::Int64)
 	I = 0
 	base = 1
 	for i in range(length(mind), step = -1, stop = 1)
@@ -270,7 +247,7 @@ function multiindex_to_linear(mind, n2)
 	return I
 end
 
-function morton_decode(I,n)
+function morton_decode(I::Int64,n::Int64)
 	row = 0
 	rowbase = 1
 	col = 0
@@ -291,29 +268,7 @@ function morton_decode(I,n)
 	return row, col
 end
 
-println(map_mult_to_kron([1,3],2))
-println(map_mult_to_kron([4,0,7],3))
-
-
-#######################################################################
-#				GRASSHOPPER KRON -- NEED TO FINISH REGIONS
-
-#=
-Generate a Kronecker graph via grass-hopping. The input K is the
-Kronecker initiator matrix and the the value k is the number of levels. 
-Example: grass_hop_kron([[0.99,0.5],[0.5,0.2]], 3)
-=#
-
-
-
-function grass_hop_kron(K,k)
-	n = length(K)
-	v = [K[i][j] for j in range(1, step = 1, stop = n) for i in range(1, step = 1, stop = n)]
-	edges_mult = []
-	
-end
-
-println(grass_hop_kron([[.99,.05],[.5,.2]], 3))
-
+#println(map_mult_to_kron([1,3],2))
+#println(map_mult_to_kron([4,0,7],3))
 
 

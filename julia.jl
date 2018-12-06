@@ -22,7 +22,7 @@ function coinflip(p)
 	return A
 end
 
-#println(coinflip(.25*ones(8,8)))  # generate a random Erdos-Renyi graph
+println(coinflip(.25*ones(8,8)))  # generate a random Erdos-Renyi graph
 
 #######################################################################
 #				BALL DROPPER
@@ -45,7 +45,7 @@ function ball_drop_er(n,p)
 	return edges
 end
 
-#println(ball_drop_er(8,.25))  # 8 node Erdos-Renyi with probablity 0.25
+println(ball_drop_er(8,.25))  # 8 node Erdos-Renyi with probablity 0.25
 
 #######################################################################
 #				GRASS HOPPER
@@ -74,7 +74,7 @@ function grass_hop_er(n,p)
 	return edges
 end
 
-#println(grass_hop_er(8,0.25))
+println(grass_hop_er(8,0.25))
 
 #######################################################################
 #				SBM2
@@ -103,7 +103,7 @@ function sbm2(n1,n2,p,q)
 	return edges
 end  
 
-#println(sbm2(20,15,.5,.1)) 
+println(sbm2(20,15,.5,.1)) 
 
 #######################################################################
 #				REGION -- UNFINISHED
@@ -218,9 +218,9 @@ function unrank(seq,n)
 	return unrank_mset_counter(mset,keys,n)
 end
 
-#println(unrank([0,1,1,3], 0))
-#println(unrank([0,1,1,3], 1))
-#println(unrank([0,1,1,3], 2))
+println(unrank([0,1,1,3], 0))
+println(unrank([0,1,1,3], 1))
+println(unrank([0,1,1,3], 2))
 
 #######################################################################
 #				GRASSHOPPER REGION -- NEED TO FINISH REGION
@@ -239,7 +239,7 @@ function multtable(r,v)
 end
 
 v = [.99, .5, .5, 2]
-#println(grass_hop_region(regions(v,3)[2],v))
+println(grass_hop_region(regions(v,3)[2],v))
 
 #######################################################################
 #				MAP MULT TO KRON
@@ -291,8 +291,8 @@ function morton_decode(I,n)
 	return row, col
 end
 
-#println(map_mult_to_kron([1,3],2))
-#println(map_mult_to_kron([4,0,7],3))
+println(map_mult_to_kron([1,3],2))
+println(map_mult_to_kron([4,0,7],3))
 
 
 #######################################################################
